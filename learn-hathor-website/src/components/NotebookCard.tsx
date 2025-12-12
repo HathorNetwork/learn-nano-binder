@@ -1,4 +1,5 @@
-import { BookOpen, Clock, Rocket } from 'lucide-react';
+import { useState } from 'react';
+import { BookOpen, Clock, Rocket, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Difficulty, Notebook } from '@/types';
 import { Button } from './ui/Button';
 import { Card, CardContent, CardFooter } from './ui/Card';
@@ -15,6 +16,8 @@ const difficultyStyles: Record<Difficulty, string> = {
 };
 
 export function NotebookCard({ notebook, onLaunch }: NotebookCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <Card hover>
       <CardContent className="pt-4">
@@ -33,9 +36,23 @@ export function NotebookCard({ notebook, onLaunch }: NotebookCardProps) {
             </span>
           </div>
         </div>
-        <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
+        <p className={`text-sm text-text-secondary leading-relaxed ${isExpanded ? '' : 'line-clamp-3'}`}>
           {notebook.description}
         </p>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+        >
+          {isExpanded ? (
+            <>
+              Show less <ChevronUp size={14} />
+            </>
+          ) : (
+            <>
+              Read more <ChevronDown size={14} />
+            </>
+          )}
+        </button>
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <div className="flex items-center gap-3 text-xs text-text-muted">
