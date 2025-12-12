@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-bg-tertiary rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-muted;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary-500 text-white;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-2 outline-primary-500 outline-offset-2;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Animation classes for modal */
+  .animate-in {
+    animation: animate-in 200ms ease-out;
+  }
+
+  .fade-in {
+    --tw-enter-opacity: 0;
+  }
+
+  .zoom-in-95 {
+    --tw-enter-scale: 0.95;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: var(--tw-enter-opacity, 1);
+      transform: scale(var(--tw-enter-scale, 1))
+        translateY(var(--tw-enter-translate-y, 0));
+    }
+  }
+}
