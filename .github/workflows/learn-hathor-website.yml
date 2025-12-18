@@ -1,14 +1,19 @@
-name: CI/CD
+name: Learn Hathor Website CI/CD
 
 on:
   push:
     branches: [main]
+    tags:
+      - 'learn-hathor-website@*'
     paths:
       - 'learn-hathor-website/**'
+      - '.github/workflows/learn-hathor-website*.yml'
   pull_request:
     branches: [main]
     paths:
       - 'learn-hathor-website/**'
+      - '.github/workflows/learn-hathor-website*.yml'
+
 defaults:
   run:
     working-directory: learn-hathor-website
@@ -17,15 +22,15 @@ env:
   NODE_VERSION: '24'
 
 jobs:
-  lint:
-    name: Lint
+  lint-and-test:
+    name: Lint & Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -43,97 +48,28 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: learn-hathor-website/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Run tests
         run: npm run test:coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           directory: learn-hathor-website/coverage
           flags: learn-hathor-website
         continue-on-error: true
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: learn-hathor-website/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: learn-hathor-website/dist
-          retention-days: 7
-
-  deploy:
-    name: Deploy to S3/CloudFront
-    runs-on: ubuntu-latest
-    needs: build
+  deploy-staging:
+    name: Deploy to Staging
+    needs: lint-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment: production
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
+    uses: ./.github/workflows/learn-hathor-website-deploy.yml
+    with:
+      environment: staging
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Deploy to S3
-        run: |
-          aws s3 sync dist/ s3://${{ vars.S3_BUCKET_NAME }}/ \
-            --delete \
-            --cache-control "public, max-age=31536000, immutable" \
-            --exclude "index.html" \
-            --exclude "*.json"
-          
-          # Upload index.html and JSON files with no-cache
-          aws s3 cp dist/index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html \
-            --cache-control "no-cache, no-store, must-revalidate"
-
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+  deploy-production:
+    name: Deploy to Production
+    needs: lint-and-test
+    if: startsWith(github.ref, 'refs/tags/learn-hathor-website@')
+    uses: ./.github/workflows/learn-hathor-website-deploy.yml
+    with:
+      environment: production
