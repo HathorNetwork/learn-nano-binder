@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Clone hathor-core to get access to hathor_tests
+git clone --depth 1 --branch nano-tutorials https://github.com/HathorNetwork/hathor-core.git /tmp/hathor-core
+
+# Add hathor_tests to the Python path by creating a .pth file
+# This tells Python to look in /tmp/hathor-core for modules
+echo "/tmp/hathor-core" > ${NB_PYTHON_PREFIX}/lib/python3.11/site-packages/hathor-tests.pth
