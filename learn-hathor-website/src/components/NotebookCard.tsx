@@ -36,7 +36,9 @@ export function NotebookCard({ notebook, onLaunch }: NotebookCardProps) {
             </span>
           </div>
         </div>
-        <p className={`text-sm text-text-secondary leading-relaxed ${isExpanded ? '' : 'line-clamp-3'}`}>
+        <p
+          className={`text-sm text-text-secondary leading-relaxed ${isExpanded ? '' : 'line-clamp-3'}`}
+        >
           {notebook.description}
         </p>
         <button

@@ -102,7 +102,6 @@ export async function streamBuild(
     let url: string | null = null;
     let token: string | null = null;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;

@@ -2,9 +2,11 @@ import type { Category } from '@/types';
 
 /**
  * BinderHub instance URL
- * Update this if using a different BinderHub deployment
+ * Configured via VITE_BINDERHUB_URL environment variable
+ * Falls back to default if not set
  */
-export const BINDERHUB_URL = 'http://35.223.144.166';
+export const BINDERHUB_URL =
+  import.meta.env.VITE_BINDERHUB_URL;
 
 /**
  * All notebook categories with their notebooks
@@ -21,7 +23,8 @@ export const categories: Category[] = [
         name: 'Creating a Hathor Blueprint: HathorDice Tutorial',
         description:
           'Learn how to create a nanocontract blueprint on Hathor. Walk through building a simple HathorDice contract, understanding blueprints, decorators, syscalls, and testing.',
-        repo: 'luislhl/my-first-binder',
+        repo: 'HathorNetwork/learn-nano-binder',
+        // TODO: update branch and filepath when notebooks are merged
         branch: 'chore/nano-tutorials',
         filepath: 'notebooks/01-blueprint-basics/Blueprint.ipynb',
         difficulty: 'beginner',
@@ -29,7 +32,7 @@ export const categories: Category[] = [
       },
       // Add more Nano Contracts notebooks here
     ],
-  }
+  },
 ];
 
 /**

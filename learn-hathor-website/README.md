@@ -2,7 +2,7 @@
 
 An interactive learning platform for Hathor Network featuring Jupyter notebooks powered by BinderHub.
 
-## 🎯 Overview
+## Overview
 
 Hathor Learning Hub provides hands-on tutorials for learning blockchain development with Hathor Network. Users can launch interactive Jupyter notebooks directly in their browser without any local setup.
 
@@ -14,7 +14,7 @@ Hathor Learning Hub provides hands-on tutorials for learning blockchain developm
 - **Modern UI**: Clean, responsive design inspired by hathor.network
 - **Zero Setup**: Everything runs in the cloud via BinderHub
 
-## �️ Tech Stack
+## Tech Stack
 
 - **React 18** - UI framework
 - **TypeScript** - Type safety
@@ -23,13 +23,189 @@ Hathor Learning Hub provides hands-on tutorials for learning blockchain developm
 - **Vitest** - Testing
 - **ESLint + Prettier** - Code quality
 
-## 📁 Project Structure
+## Getting Started
+
+### Prerequisites
+
+- Node.js 24+
+- npm
+- AWS CLI (for deployment)
+
+### Installation
+
+```bash
+cd learn-hathor-website
+npm install
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173 in your browser.
+
+### Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Fix ESLint errors |
+| `npm run format` | Format code with Prettier |
+| `npm run format:check` | Check formatting |
+| `npm run test` | Run tests in watch mode |
+| `npm run test:run` | Run tests once |
+| `npm run test:coverage` | Run tests with coverage |
+| `npm run typecheck` | Type check with TypeScript |
+
+## Adding Notebooks
+
+Notebooks are configured in `src/config/notebooks.ts`.
+
+### Adding a Notebook to an Existing Category
+
+1. Open `src/config/notebooks.ts`
+2. Find the appropriate category in the `categories` array
+3. Add a new notebook entry:
+
+```typescript
+{
+  id: 'unique-notebook-id',           // Unique identifier (kebab-case)
+  name: 'Notebook Display Name',      // Title shown in the UI
+  description: 'Description of what the notebook covers...',
+  repo: 'HathorNetwork/learn-nano-binder',  // GitHub repo (owner/repo format)
+  branch: 'main',                     // Git branch containing the notebook
+  filepath: 'notebooks/path/to/notebook.ipynb',  // Path to .ipynb file
+  difficulty: 'beginner',             // 'beginner' | 'intermediate' | 'advanced'
+  duration: '15 min',                 // Optional: estimated completion time
+}
+```
+
+### Creating a New Category
+
+Add a new category object to the `categories` array:
+
+```typescript
+{
+  id: 'category-id',
+  name: 'Category Name',
+  description: 'Category description',
+  icon: 'code',  // 'code' | 'layers' | 'coins' | 'wallet'
+  notebooks: [
+    // Add notebooks here
+  ],
+}
+```
+
+### Available Icons
+
+- `code` - For coding/development topics
+- `layers` - For architecture concepts
+- `coins` - For token-related content
+- `wallet` - For wallet/transaction topics
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_BINDERHUB_URL` | BinderHub instance URL | undefined |
+
+For local development, create a `.env.local` file:
+
+```env
+VITE_BINDERHUB_URL=http://localhost:8585
+```
+
+## Deployment
+
+### Environments
+
+| Environment | S3 Bucket | CloudFront ID | BinderHub URL |
+|-------------|-----------|---------------|---------------|
+| Staging | `learn-hathor-network-staging` | `EH3J6VVGDO86Q` | `https://binder.staging.learn.hathor.network` |
+| Production | `learn-hathor-network-production` | `E2PZDB3T8EMYOC` | `https://binder.learn.hathor.network` |
+
+### Manual Deployment from Local Machine
+
+Ensure you have AWS CLI configured with appropriate credentials.
+
+#### Using Make (recommended)
+
+```bash
+# Full deploy to staging (build + sync + cache invalidation)
+make deploy site=staging
+
+# Full deploy to production
+make deploy site=production
+
+# With a specific AWS profile
+make deploy site=staging aws_profile=hathor-staging
+
+# Individual steps
+make build site=staging
+make sync site=staging
+make clear_cloudfront_cache site=staging
+```
+
+#### Using the deploy script directly
+
+```bash
+# Build for staging
+./scripts/deploy.sh staging build
+
+# Sync to S3
+./scripts/deploy.sh staging sync
+
+# Clear CloudFront cache
+./scripts/deploy.sh staging clear_cache
+
+# With AWS profile
+./scripts/deploy.sh production sync my-aws-profile
+```
+
+### CI/CD Pipeline
+
+The GitHub Actions workflows (`.github/workflows/learn-hathor-website*.yml`) run automatically:
+
+**On Pull Requests to `main`:**
+- **Lint & Test** - ESLint, Prettier, TypeScript checks, and Vitest with coverage
+
+**On Push to `main`:**
+- **Lint & Test** - Same as above
+- **Deploy to Staging** - Builds and deploys to staging environment
+
+**On Tags matching `learn-hathor-website@*` (e.g., `learn-hathor-website@1.2.3`):**
+- **Lint & Test** - Same as above
+- **Deploy to Production** - Builds and deploys to production environment
+
+#### Creating a Production Release
+
+```bash
+# Tag a new version and push
+git tag learn-hathor-website@1.0.0
+git push origin learn-hathor-website@1.0.0
+```
+
+## Testing
+
+```bash
+# Run tests in watch mode
+npm run test
+
+# Run tests once with coverage
+npm run test:coverage
+```
+
+Tests are located next to the files they test (e.g., `Button.test.tsx`).
+
+## Project Structure
 
 ```
-binderhub-launcher/
-├── public/                       # Static assets
-│   ├── favicon.svg
-│   └── hathor-logo.svg
+learn-hathor-website/
 ├── src/
 │   ├── components/
 │   │   ├── ui/                   # Reusable UI components
@@ -59,152 +235,20 @@ binderhub-launcher/
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
-├── index.html
+├── public/                       # Static assets
+├── scripts/
+│   └── deploy.sh                 # Deployment script
+├── .github/workflows/
+│   └── learn-hathor-website.yml  # CI/CD configuration
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
 ├── vitest.config.ts
 ├── tailwind.config.ts
-├── .eslintrc.cjs
-└── .prettierrc
+└── Makefile
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-
-### Installation
-
-```bash
-cd binderhub-launcher
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-Open http://localhost:5173 in your browser.
-
-### Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Fix ESLint errors |
-| `npm run format` | Format code with Prettier |
-| `npm run format:check` | Check formatting |
-| `npm run test` | Run tests in watch mode |
-| `npm run test:run` | Run tests once |
-| `npm run test:coverage` | Run tests with coverage |
-| `npm run typecheck` | Type check with TypeScript |
-
-## 📝 Adding Notebooks
-
-Edit `src/config/notebooks.ts` to add new notebooks:
-
-```typescript
-export const categories: Category[] = [
-  {
-    id: 'nano-contracts',
-    name: 'Nano Contracts',
-    description: 'Learn to build Python-powered smart contracts',
-    icon: 'code',
-    notebooks: [
-      {
-        id: 'unique-id',
-        name: 'Notebook Title',
-        description: 'Brief description of what users will learn.',
-        repo: 'owner/repository',
-        branch: 'main',
-        filepath: 'path/to/notebook.ipynb',
-        difficulty: 'beginner', // 'beginner' | 'intermediate' | 'advanced'
-        duration: '15 min',     // optional
-      },
-    ],
-  },
-];
-```
-
-### Available Icons
-
-- `code` - For coding/development topics
-- `layers` - For architecture concepts
-- `coins` - For token-related content
-- `wallet` - For wallet/transaction topics
-
-## 🔧 Configuration
-
-### BinderHub URL
-
-Update the BinderHub URL in `src/config/notebooks.ts`:
-
-```typescript
-export const BINDERHUB_URL = 'http://your-binderhub-instance';
-```
-
-### Environment Variables
-
-For deployment, configure these in GitHub Actions:
-
-| Variable | Description |
-|----------|-------------|
-| `AWS_ROLE_ARN` | IAM role ARN for OIDC authentication (secret) |
-| `AWS_REGION` | AWS region (variable) |
-| `S3_BUCKET_NAME` | S3 bucket name (variable) |
-| `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID (variable) |
-
-## 🚢 Deployment
-
-This project is configured for deployment to AWS S3 + CloudFront.
-
-### CI/CD Pipeline
-
-The GitHub Actions workflow (`.github/workflows/binderhub-launcher.yml`) runs:
-
-1. **Lint** - ESLint, Prettier, TypeScript checks
-2. **Test** - Vitest with coverage
-3. **Build** - Production build with Vite
-4. **Deploy** - Sync to S3 and invalidate CloudFront cache
-
-Deployment happens automatically on pushes to `main` branch.
-
-### Manual Deployment
-
-```bash
-# Build
-npm run build
-
-# Deploy to S3
-aws s3 sync dist/ s3://your-bucket-name/ --delete
-
-# Invalidate CloudFront cache
-aws cloudfront create-invalidation \
-  --distribution-id YOUR_DISTRIBUTION_ID \
-  --paths "/*"
-```
-
-## 🧪 Testing
-
-```bash
-# Run tests in watch mode
-npm run test
-
-# Run tests once with coverage
-npm run test:coverage
-```
-
-Tests are located next to the files they test (e.g., `Button.test.tsx`).
-
-## 🎨 Customization
+## Customization
 
 ### Colors
 
@@ -229,11 +273,7 @@ export default {
 
 The project uses [Inter](https://fonts.google.com/specimen/Inter) font. Update the Google Fonts import in `index.html` to change fonts.
 
-## 📄 License
-
-MIT License
-
-## 🔗 Links
+## Links
 
 - [Hathor Network](https://hathor.network)
 - [Hathor Documentation](https://docs.hathor.network)

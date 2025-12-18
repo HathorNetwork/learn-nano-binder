@@ -29,6 +29,7 @@ npm-debug.log*
 # Cache
 .eslintcache
 .cache/
+*.tsbuildinfo
 
 # Old
 .netlify
