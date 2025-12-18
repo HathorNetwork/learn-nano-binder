@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Layout, CategoryAccordion, BuildModal } from '@/components';
+import { Layout, CategoryAccordion, BuildModal, InfoSection } from '@/components';
 import { useBinderBuild } from '@/hooks';
 import { getCategoriesWithNotebooks, getNotebookById } from '@/config';
 import type { Notebook } from '@/types';
@@ -85,6 +85,9 @@ function App() {
           )}
         </div>
       </section>
+
+      {/* Info Section */}
+      <InfoSection />
 
       {/* Build Modal */}
       <BuildModal
