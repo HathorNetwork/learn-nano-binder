@@ -76,8 +76,8 @@ export interface BuildStreamCallbacks {
 }
 
 /**
- * Start streaming build events from BinderHub
- * Returns an abort controller to cancel the stream
+ * Start streaming build events from BinderHub using EventSource
+ * EventSource provides automatic reconnection for long-running builds
  */
 export async function streamBuild(
   notebook: Notebook,
@@ -86,67 +86,72 @@ export async function streamBuild(
 ): Promise<void> {
   const buildUrl = getBuildUrl(notebook);
 
-  try {
-    const response = await fetch(buildUrl, { signal });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error('No response body');
-    }
-
-    const decoder = new TextDecoder();
+  return new Promise((resolve) => {
+    const eventSource = new EventSource(buildUrl);
     let url: string | null = null;
     let token: string | null = null;
+    let completed = false;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    const cleanup = () => {
+      if (!completed) {
+        completed = true;
+        eventSource.close();
+        callbacks.onComplete();
+        resolve();
+      }
+    };
 
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
+    // Handle abort signal
+    if (signal) {
+      signal.addEventListener('abort', () => {
+        cleanup();
+      });
+    }
 
-      for (const line of lines) {
-        if (line.startsWith('data:')) {
-          const data = line.substring(5).trim();
-          const message = parseBinderHubMessage(data);
+    eventSource.onmessage = (event: MessageEvent<string>) => {
+      const data = event.data;
+      const message = parseBinderHubMessage(data);
 
-          if (message) {
-            callbacks.onMessage(message, data);
+      if (message) {
+        callbacks.onMessage(message, data);
 
-            // Check if ready
-            if (message.phase === 'ready' && message.url && message.token) {
-              url = message.url;
-              token = message.token;
-            }
+        // Check if ready
+        if (message.phase === 'ready' && message.url && message.token) {
+          url = message.url;
+          token = message.token;
+          callbacks.onReady(url, token);
+          cleanup();
+        }
 
-            // Check for failure
-            if (message.phase === 'failed') {
-              throw new Error(message.message || 'Build failed');
-            }
-          }
+        // Check for failure
+        if (message.phase === 'failed') {
+          callbacks.onError(new Error(message.message || 'Build failed'));
+          cleanup();
         }
       }
-    }
+    };
 
-    // Build complete
-    if (url && token) {
-      callbacks.onReady(url, token);
-    } else {
-      throw new Error('Build completed but no URL received');
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      // Build was cancelled, don't call error callback
-      return;
-    }
-    callbacks.onError(
-      error instanceof Error ? error : new Error(String(error))
-    );
-  } finally {
-    callbacks.onComplete();
-  }
+    eventSource.onerror = (event: Event) => {
+      // EventSource will automatically try to reconnect on most errors
+      // Only treat it as a fatal error if we haven't received a ready/failed state
+      // and the connection is closed
+      if (eventSource.readyState === EventSource.CLOSED) {
+        // Check if we got a successful build before the connection closed
+        if (url && token) {
+          callbacks.onReady(url, token);
+        } else if (!completed) {
+          // Connection closed without success - could be network issue or server timeout
+          callbacks.onError(
+            new Error(
+              'Connection to build server lost. The build may still be in progress - try launching again in a moment.'
+            )
+          );
+        }
+        cleanup();
+      }
+      // If readyState is CONNECTING, EventSource is trying to reconnect automatically
+      // We don't need to do anything in that case
+      console.debug('EventSource error event, readyState:', eventSource.readyState, event);
+    };
+  });
 }
