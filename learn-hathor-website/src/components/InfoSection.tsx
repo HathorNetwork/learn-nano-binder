@@ -1,4 +1,4 @@
-import { AlertCircle, Clock, Users, Server } from 'lucide-react';
+import { AlertCircle, Clock, Users, Timer } from 'lucide-react';
 import { Card, CardContent } from './ui';
 
 interface LimitItemProps {
@@ -37,17 +37,17 @@ export function InfoSection() {
         <Card>
           <CardContent className="pt-4 space-y-6">
             <LimitItem
-              icon={<Server className="w-5 h-5" />}
-              title="Maximum 2 Parallel Notebooks"
-              description="Each user can run up to 2 notebooks simultaneously. If you need to launch a new notebook and have reached this limit, please shut down an existing one first. Otherwise, you'll need to wait until the server automatically shuts down inactive notebooks."
+              icon={<Clock className="w-5 h-5" />}
+              title="2 Builds Per Hour"
+              description="You can launch up to 2 notebook builds per hour. This limit applies regardless of whether you shut down your servers — it's based on the total number of builds initiated within a one-hour window."
             />
 
             <div className="border-t border-white/10" />
 
             <LimitItem
-              icon={<Clock className="w-5 h-5" />}
-              title="10 Builds Per Hour"
-              description="You can launch up to 10 notebook builds per hour. This limit applies regardless of whether you shut down your servers — it's based on the total number of builds initiated within a one-hour window."
+              icon={<Timer className="w-5 h-5" />}
+              title="Automatic Notebook Shutdown"
+              description="Notebooks will automatically shut down after 15 minutes of inactivity to free up resources. Additionally, all notebooks have a maximum runtime of 1 hour regardless of activity."
             />
 
             <div className="border-t border-white/10" />
