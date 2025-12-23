@@ -2,14 +2,14 @@ name: Learn Hathor Website CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     tags:
       - 'learn-hathor-website@*'
     paths:
       - 'learn-hathor-website/**'
       - '.github/workflows/learn-hathor-website*.yml'
   pull_request:
-    branches: [main]
+    branches: [master]
     paths:
       - 'learn-hathor-website/**'
       - '.github/workflows/learn-hathor-website*.yml'
@@ -51,17 +51,10 @@ jobs:
       - name: Run tests
         run: npm run test:coverage
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v5
-        with:
-          directory: learn-hathor-website/coverage
-          flags: learn-hathor-website
-        continue-on-error: true
-
   deploy-staging:
     name: Deploy to Staging
     needs: lint-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     uses: ./.github/workflows/learn-hathor-website-deploy.yml
     with:
       environment: staging
