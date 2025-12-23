@@ -1,6 +1,13 @@
 #!/bin/bash
 
+###
+# This postBuild script is meant to be used by BinderHub to set up the
+# environment. It will clone hathor-core and add it to the Python path so that
+# notebooks can import hathor_tests for testing purposes.
+###
+
 # Clone hathor-core to get access to hathor_tests
+# TODO: We have to update the branch after merging the nano-tutorials branch
 git clone --depth 1 --branch nano-tutorials https://github.com/HathorNetwork/hathor-core.git /tmp/hathor-core
 
 # Add hathor_tests to the Python path by creating a .pth file
