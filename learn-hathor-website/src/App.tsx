@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Layout, CategoryAccordion, BuildModal, InfoSection } from '@/components';
+import {
+  Layout,
+  CategoryAccordion,
+  BuildModal,
+  InfoSection,
+} from '@/components';
 import { useBinderBuild } from '@/hooks';
 import { getCategoriesWithNotebooks, getNotebookById } from '@/config';
 import type { Notebook } from '@/types';

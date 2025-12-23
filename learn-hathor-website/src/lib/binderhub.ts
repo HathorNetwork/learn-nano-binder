@@ -151,7 +151,11 @@ export async function streamBuild(
       }
       // If readyState is CONNECTING, EventSource is trying to reconnect automatically
       // We don't need to do anything in that case
-      console.debug('EventSource error event, readyState:', eventSource.readyState, event);
+      console.debug(
+        'EventSource error event, readyState:',
+        eventSource.readyState,
+        event
+      );
     };
   });
 }

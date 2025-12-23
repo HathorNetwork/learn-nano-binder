@@ -5,8 +5,7 @@ import type { Category } from '@/types';
  * Configured via VITE_BINDERHUB_URL environment variable
  * Falls back to default if not set
  */
-export const BINDERHUB_URL =
-  import.meta.env.VITE_BINDERHUB_URL;
+export const BINDERHUB_URL = import.meta.env.VITE_BINDERHUB_URL;
 
 /**
  * All notebook categories with their notebooks
