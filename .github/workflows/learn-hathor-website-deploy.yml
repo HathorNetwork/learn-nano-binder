@@ -1,0 +1,56 @@
+name: Learn Hathor Website Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to deploy to (staging or production)'
+        required: true
+        type: string
+
+defaults:
+  run:
+    working-directory: learn-hathor-website
+
+env:
+  NODE_VERSION: '24'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: learn-hathor-website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials (staging)
+        if: inputs.environment == 'staging'
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::769498303037:role/LearnHathorNetworkGitHubActionsRoleStaging
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure AWS credentials (production)
+        if: inputs.environment == 'production'
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::769498303037:role/LearnHathorNetworkGitHubActionsRoleProduction
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy
+        run: make deploy site=${{ inputs.environment }}

@@ -1,0 +1,68 @@
+name: Learn Hathor Website CI/CD
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - 'learn-hathor-website@*'
+    paths:
+      - 'learn-hathor-website/**'
+      - '.github/workflows/learn-hathor-website*.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'learn-hathor-website/**'
+      - '.github/workflows/learn-hathor-website*.yml'
+
+defaults:
+  run:
+    working-directory: learn-hathor-website
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: learn-hathor-website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm run test:coverage
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    uses: ./.github/workflows/learn-hathor-website-deploy.yml
+    with:
+      environment: staging
+
+  deploy-production:
+    name: Deploy to Production
+    needs: lint-and-test
+    if: startsWith(github.ref, 'refs/tags/learn-hathor-website@')
+    uses: ./.github/workflows/learn-hathor-website-deploy.yml
+    with:
+      environment: production
