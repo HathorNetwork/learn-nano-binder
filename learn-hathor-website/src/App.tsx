@@ -23,6 +23,8 @@ function App() {
     progress,
     notebookUrl,
     error,
+    repo,
+    branch,
     startBuild,
     cancelBuild,
     resetBuild,
@@ -107,6 +109,8 @@ function App() {
           progress,
           notebookUrl,
           error,
+          repo,
+          branch,
         }}
         onCancel={handleCancelBuild}
       />

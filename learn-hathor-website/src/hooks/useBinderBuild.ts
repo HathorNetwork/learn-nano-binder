@@ -4,6 +4,7 @@ import {
   formatPhase,
   getNotebookUrl,
   getPhaseProgress,
+  resolveBranch,
   streamBuild,
 } from '@/lib/binderhub';
 
@@ -15,6 +16,8 @@ const initialState: BuildState = {
   progress: 0,
   notebookUrl: null,
   error: null,
+  repo: null,
+  branch: null,
 };
 
 /**
@@ -32,11 +35,16 @@ export function useBinderBuild() {
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
 
+    // Resolve branch before building
+    const resolvedBranch = await resolveBranch(notebook.branch);
+
     // Reset state
     setState({
       ...initialState,
       status: 'building',
       message: 'Connecting to BinderHub...',
+      repo: notebook.repo,
+      branch: resolvedBranch,
     });
 
     await streamBuild(

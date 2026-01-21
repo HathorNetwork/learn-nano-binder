@@ -42,4 +42,8 @@ export interface BuildState {
   notebookUrl: string | null;
   /** Error message (when failed) */
   error: string | null;
+  /** Repository being built (owner/repo) */
+  repo: string | null;
+  /** Branch/tag being built (resolved) */
+  branch: string | null;
 }

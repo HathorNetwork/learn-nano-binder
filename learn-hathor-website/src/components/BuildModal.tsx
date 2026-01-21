@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronDown, CheckCircle, XCircle, GitBranch } from 'lucide-react';
 import type { BuildState, Notebook } from '@/types';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -81,6 +81,24 @@ export function BuildModal({
 
       {/* Progress bar */}
       <ProgressBar progress={buildState.progress} className="mb-4" />
+
+      {/* Repository and branch info */}
+      {buildState.repo && buildState.branch && (
+        <div className="mb-4 p-3 bg-bg-secondary rounded-lg border border-white/10">
+          <div className="flex items-center gap-2 text-sm">
+            <GitBranch size={16} className="text-text-tertiary" />
+            <span className="text-text-secondary">
+              <span className="text-text-primary font-medium">
+                {buildState.repo}
+              </span>
+              {' @ '}
+              <span className="text-primary-400 font-mono">
+                {buildState.branch}
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Logs toggle */}
       <div className="border border-white/10 rounded-lg overflow-hidden">
