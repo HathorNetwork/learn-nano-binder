@@ -5,6 +5,7 @@ import {
   getBuildUrl,
   getNotebookUrl,
   parseBinderHubMessage,
+  resolveBranch,
 } from '@/lib/binderhub';
 import type { Notebook } from '@/types';
 
@@ -35,8 +36,31 @@ describe('binderhub lib', () => {
     });
   });
 
+  describe('resolveBranch', () => {
+    it('returns string branch as is', async () => {
+      const branch = await resolveBranch('main');
+      expect(branch).toBe('main');
+    });
+
+    it('resolves function that returns string', async () => {
+      const branch = await resolveBranch(() => 'develop');
+      expect(branch).toBe('develop');
+    });
+
+    it('resolves async function that returns string', async () => {
+      const branch = await resolveBranch(async () => 'feature/test');
+      expect(branch).toBe('feature/test');
+    });
+
+    it('resolves function that returns promise', async () => {
+      const branchFn = () => Promise.resolve('v1.0.0');
+      const branch = await resolveBranch(branchFn);
+      expect(branch).toBe('v1.0.0');
+    });
+  });
+
   describe('getBuildUrl', () => {
-    it('constructs correct build URL', () => {
+    it('constructs correct build URL with string branch', async () => {
       const notebook: Notebook = {
         id: 'test',
         name: 'Test',
@@ -47,11 +71,41 @@ describe('binderhub lib', () => {
         difficulty: 'beginner',
       };
 
-      const url = getBuildUrl(notebook);
+      const url = await getBuildUrl(notebook);
       expect(url).toContain('/build/gh/owner/repo/main');
     });
 
-    it('handles branches with slashes', () => {
+    it('constructs correct build URL with function branch', async () => {
+      const notebook: Notebook = {
+        id: 'test',
+        name: 'Test',
+        description: 'Test notebook',
+        repo: 'owner/repo',
+        branch: () => 'v1.2.3',
+        filepath: 'test.ipynb',
+        difficulty: 'beginner',
+      };
+
+      const url = await getBuildUrl(notebook);
+      expect(url).toContain('/build/gh/owner/repo/v1.2.3');
+    });
+
+    it('constructs correct build URL with async function branch', async () => {
+      const notebook: Notebook = {
+        id: 'test',
+        name: 'Test',
+        description: 'Test notebook',
+        repo: 'owner/repo',
+        branch: async () => 'v2.0.0',
+        filepath: 'test.ipynb',
+        difficulty: 'beginner',
+      };
+
+      const url = await getBuildUrl(notebook);
+      expect(url).toContain('/build/gh/owner/repo/v2.0.0');
+    });
+
+    it('handles branches with slashes', async () => {
       const notebook: Notebook = {
         id: 'test',
         name: 'Test',
@@ -62,7 +116,7 @@ describe('binderhub lib', () => {
         difficulty: 'beginner',
       };
 
-      const url = getBuildUrl(notebook);
+      const url = await getBuildUrl(notebook);
       expect(url).toContain('feature/test');
     });
   });

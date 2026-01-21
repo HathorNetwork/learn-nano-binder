@@ -15,8 +15,8 @@ export interface Notebook {
   description: string;
   /** GitHub repository in owner/repo format */
   repo: string;
-  /** Git branch containing the notebook */
-  branch: string;
+  /** Git branch containing the notebook - can be a string or function that resolves to a string */
+  branch: string | (() => string | Promise<string>);
   /** Path to the .ipynb file within the repository */
   filepath: string;
   /** Difficulty level */

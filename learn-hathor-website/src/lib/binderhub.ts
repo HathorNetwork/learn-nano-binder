@@ -2,10 +2,24 @@ import type { BinderHubMessage, BuildPhase, Notebook } from '@/types';
 import { BINDERHUB_URL } from '@/config';
 
 /**
+ * Resolve a notebook's branch to a string
+ * Handles both static strings and dynamic functions
+ */
+export async function resolveBranch(
+  branch: string | (() => string | Promise<string>)
+): Promise<string> {
+  if (typeof branch === 'function') {
+    return await branch();
+  }
+  return branch;
+}
+
+/**
  * Build the BinderHub API URL for a notebook
  */
-export function getBuildUrl(notebook: Notebook): string {
-  const encodedBranch = encodeURIComponent(notebook.branch).replace('%2F', '/');
+export async function getBuildUrl(notebook: Notebook): Promise<string> {
+  const branch = await resolveBranch(notebook.branch);
+  const encodedBranch = encodeURIComponent(branch).replace('%2F', '/');
   return `${BINDERHUB_URL}/build/gh/${notebook.repo}/${encodedBranch}`;
 }
 
@@ -84,7 +98,7 @@ export async function streamBuild(
   callbacks: BuildStreamCallbacks,
   signal?: AbortSignal
 ): Promise<void> {
-  const buildUrl = getBuildUrl(notebook);
+  const buildUrl = await getBuildUrl(notebook);
 
   return new Promise((resolve) => {
     const eventSource = new EventSource(buildUrl);
