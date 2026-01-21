@@ -10,7 +10,7 @@
  */
 export async function getLatestReleaseTag(repo: string): Promise<string> {
   const url = `https://api.github.com/repos/${repo}/releases/latest`;
-  
+
   try {
     const response = await fetch(url, {
       headers: {
@@ -23,7 +23,7 @@ export async function getLatestReleaseTag(repo: string): Promise<string> {
     }
 
     const data = await response.json();
-    
+
     if (!data.tag_name) {
       throw new Error('No tag_name found in release data');
     }
@@ -41,7 +41,7 @@ export async function getLatestReleaseTag(repo: string): Promise<string> {
  * @param repo Repository in owner/repo format
  * @returns Function that returns the latest release tag
  */
-export function useLatestRelease(repo: string): () => Promise<string> {
+export function createLatestReleaseGetter(repo: string): () => Promise<string> {
   let cachedTag: string | null = null;
   let pendingPromise: Promise<string> | null = null;
 

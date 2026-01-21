@@ -1,5 +1,5 @@
 import type { Category } from '@/types';
-import { useLatestRelease } from '@/lib/github';
+import { createLatestReleaseGetter } from '@/lib/github';
 
 /**
  * BinderHub instance URL
@@ -10,9 +10,9 @@ export const BINDERHUB_URL = import.meta.env.VITE_BINDERHUB_URL;
 
 /**
  * All notebook categories with their notebooks
- * 
+ *
  * Branch configuration examples:
- * - Dynamic (latest release): branch: useLatestRelease('owner/repo')
+ * - Dynamic (latest release): branch: createLatestReleaseGetter('owner/repo')
  * - Static branch: branch: 'main'
  * - Custom function: branch: () => 'feature/test'
  * - Async function: branch: async () => 'v1.0.0'
@@ -30,7 +30,7 @@ export const categories: Category[] = [
         description:
           'Learn how to create a nanocontract blueprint on Hathor. Walk through building a simple HathorDice contract, understanding blueprints, decorators, syscalls, and testing.',
         repo: 'HathorNetwork/learn-nano-binder',
-        branch: useLatestRelease('HathorNetwork/learn-nano-binder'),
+        branch: createLatestReleaseGetter('HathorNetwork/learn-nano-binder'),
         filepath: 'notebooks/01-blueprint-basics/Blueprint.ipynb',
         difficulty: 'beginner',
         duration: '20 min',

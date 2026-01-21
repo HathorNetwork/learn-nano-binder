@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { ChevronDown, CheckCircle, XCircle, GitBranch, ExternalLink } from 'lucide-react';
+import {
+  ChevronDown,
+  CheckCircle,
+  XCircle,
+  GitBranch,
+  ExternalLink,
+} from 'lucide-react';
 import type { BuildState, Notebook } from '@/types';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
