@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, CheckCircle, XCircle, GitBranch } from 'lucide-react';
+import { ChevronDown, CheckCircle, XCircle, GitBranch, ExternalLink } from 'lucide-react';
 import type { BuildState, Notebook } from '@/types';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -33,6 +33,12 @@ export function BuildModal({
   const isReady = buildState.status === 'ready';
   const isError = buildState.status === 'error';
 
+  const handleOpenNotebook = () => {
+    if (buildState.notebookUrl) {
+      window.open(buildState.notebookUrl, '_blank');
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -46,9 +52,17 @@ export function BuildModal({
       }
       subtitle={notebook?.name}
       footer={
-        <Button variant="secondary" onClick={handleClose}>
-          {isBuilding ? 'Cancel' : 'Close'}
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="secondary" onClick={handleClose}>
+            {isBuilding ? 'Cancel' : 'Close'}
+          </Button>
+          {isReady && buildState.notebookUrl && (
+            <Button onClick={handleOpenNotebook}>
+              <ExternalLink size={16} />
+              Open Notebook
+            </Button>
+          )}
+        </div>
       }
     >
       {/* Status */}

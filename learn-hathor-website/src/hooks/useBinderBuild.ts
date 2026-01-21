@@ -81,15 +81,10 @@ export function useBinderBuild() {
             ...prev,
             status: 'ready',
             phase: 'ready',
-            message: 'Environment ready! Opening notebook...',
+            message: 'Environment ready! Click the button below to open.',
             progress: 100,
             notebookUrl,
           }));
-
-          // Open notebook in new tab
-          setTimeout(() => {
-            window.open(notebookUrl, '_blank');
-          }, 1000);
         },
         onError: (error) => {
           setState((prev) => ({
