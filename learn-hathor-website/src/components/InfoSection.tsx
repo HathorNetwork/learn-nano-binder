@@ -1,4 +1,4 @@
-import { AlertCircle, Clock, Users, Timer } from 'lucide-react';
+import { AlertCircle, Clock, Users, Timer, BookOpen } from 'lucide-react';
 import { Card, CardContent } from './ui';
 
 interface LimitItemProps {
@@ -37,9 +37,17 @@ export function InfoSection() {
         <Card>
           <CardContent className="pt-4 space-y-6">
             <LimitItem
+              icon={<BookOpen className="w-5 h-5" />}
+              title="Using Jupyter Notebooks"
+              description="When you launch a notebook, it will open in JupyterLab. Run each cell sequentially to advance through the tutorial and see the output. Feel free to add your own cells to experiment. For more information, check the 'Help' menu in JupyterLab."
+            />
+
+            <div className="border-t border-white/10" />
+
+            <LimitItem
               icon={<Clock className="w-5 h-5" />}
-              title="2 Builds Per Hour"
-              description="You can launch up to 2 notebook builds per hour. This limit applies regardless of whether you shut down your servers — it's based on the total number of builds initiated within a one-hour window."
+              title="Rate Limits"
+              description="Rate limits are in place to prevent abuse and ensure fair access for all users. If you hit a rate limit, please wait a few minutes before trying again."
             />
 
             <div className="border-t border-white/10" />
@@ -47,7 +55,7 @@ export function InfoSection() {
             <LimitItem
               icon={<Timer className="w-5 h-5" />}
               title="Automatic Notebook Shutdown"
-              description="Notebooks will automatically shut down after 15 minutes of inactivity to free up resources. Additionally, all notebooks have a maximum runtime of 1 hour regardless of activity."
+              description="Notebooks will automatically shut down after 10 minutes of inactivity to free up resources. Additionally, all notebooks have a maximum runtime of 1 hour regardless of activity."
             />
 
             <div className="border-t border-white/10" />
