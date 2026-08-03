@@ -1,5 +1,19 @@
 # Nano Tutorials
 
+> [!IMPORTANT]
+> **The hosted version of these tutorials has been decommissioned (August 2026).**
+>
+> `learn.hathor.network` and the BinderHub backend that powered its "launch notebook"
+> button no longer exist, so the notebooks can no longer be run in the browser. The
+> supporting infrastructure — a dedicated GCP project and GKE cluster, plus the AWS
+> S3/CloudFront site — was removed to eliminate its recurring cost.
+>
+> **The tutorial content in this repository is unaffected and still works locally.**
+> Follow [Running the tutorials](#running-the-tutorials) below.
+>
+> See [HathorNetwork/ops-tools#1479](https://github.com/HathorNetwork/ops-tools/issues/1479)
+> for the decommission record.
+
 ## Directory overview
 
 This directory contains interactive Jupyter notebook tutorials for learning Hathor nanocontract development. Each tutorial is self-contained with runnable code examples, comprehensive explanations, and hands-on testing.
