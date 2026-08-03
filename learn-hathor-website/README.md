@@ -1,5 +1,20 @@
 # Hathor Learning Hub
 
+> [!IMPORTANT]
+> **This site has been decommissioned (August 2026) and is no longer deployed.**
+>
+> `learn.hathor.network` and `staging.learn.hathor.network` no longer resolve. The
+> S3 buckets, CloudFront distributions, ACM certificates and GitHub Actions OIDC
+> roles described under [Deployment](#deployment) have all been deleted, along with
+> the BinderHub backend on GCP that served the notebooks. **The deployment
+> instructions below no longer work and are kept for historical reference only.**
+>
+> The application code still builds and runs locally, and the notebook content in
+> the repository root is unaffected.
+>
+> See [HathorNetwork/ops-tools#1479](https://github.com/HathorNetwork/ops-tools/issues/1479)
+> for the decommission record.
+
 An interactive learning platform for Hathor Network featuring Jupyter notebooks powered by BinderHub.
 
 ## Overview
